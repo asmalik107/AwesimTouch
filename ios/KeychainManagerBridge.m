@@ -13,10 +13,13 @@
 
   RCT_EXTERN_METHOD(test)
 
-  RCT_EXTERN_METHOD(save: (NSString*) key password:(NSString*) password)
+  RCT_EXTERN_METHOD(save: (NSString*) key password:(NSString*) password resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 
-  RCT_EXTERN_METHOD(getItem: (NSString*) key)
+  RCT_EXTERN_METHOD(getItem: (NSString*) key resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 
-  RCT_EXTERN_METHOD(delete: (NSString*) key)
+  RCT_EXTERN_METHOD(delete: (NSString*) key resolver:(RCTPromiseResolveBlock)resolve
+                  rejecter:(RCTPromiseRejectBlock)reject)
 
 @end

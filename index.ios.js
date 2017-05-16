@@ -26,14 +26,23 @@ export default class AwesimTouch extends Component {
     this.state = {p: ''};
   }
 
+  getKey() {
+    return KeychainManager.getItem('myKey')
+      .then(p => {
+        console.log('Password', p);
+
+        this.setState({p});
+
+        //KeychainManager.delete('myKey');
+      });
+  }
+
   componentDidMount() {
-    KeychainManager.save('myKey', 'Some text');
-    const p = KeychainManager.getItem('myKey');
-    console.log('Password', p);
-
-    this.setState({p});
-
-    KeychainManager.delete('myKey');
+    KeychainManager.save('myKey', 'Some text')
+      .then(this.getKey)
+      .catch(e => {
+      console.log(e)
+    });
   }
 
   render() {
