@@ -19,7 +19,7 @@ class KeychainManager : NSObject{
     print("REMOVE SUCCESSFUL", removeSuccessful);
   }
   
-  @objc func save(_ key:String, password:String, resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock){
+  @objc func save(_ key:String, password:String, callback:@escaping RCTResponseSenderBlock){
     let keychain = Keychain()
     DispatchQueue.global().async {
     do {
@@ -27,11 +27,11 @@ class KeychainManager : NSObject{
         .accessibility(.whenPasscodeSetThisDeviceOnly, authenticationPolicy: .userPresence)
         .set(password, key: key)
       
-      resolve(true)
+      callback([NSNull(), true]);
     }
     catch let error {
       print(error)
-      reject("SAVE FAILED", "", error)
+      callback([error, NSNull()]);
     }
     }
     
@@ -39,7 +39,7 @@ class KeychainManager : NSObject{
     print("SAVE _SUCCESSFUL", saveSuccessful);*/
   }
   
-  @objc func getItem(_ key:String, resolve:@escaping RCTPromiseResolveBlock, reject:@escaping RCTPromiseRejectBlock) {
+  @objc func getItem(_ key:String, callback:@escaping RCTResponseSenderBlock) {
     let keychain = Keychain()
     
     DispatchQueue.global().async {
@@ -49,11 +49,12 @@ class KeychainManager : NSObject{
           .get(key)
         
         print("GET_ITEM: \(String(describing: password))")
-        resolve(password)
+        
+        callback([NSNull(), password!]);
       } catch let error {
         print(error)
         
-        reject("GET FAILED", "", error)
+        callback([RCTMakeError("Failed to get Item from Keychain", error, ["key": key]), NSNull()]);
       }
     }
     
@@ -63,18 +64,19 @@ class KeychainManager : NSObject{
     return retrievedString ?? ""*/
   }
   
-  @objc func delete(_ key:String, resolve:RCTPromiseResolveBlock, reject:RCTPromiseRejectBlock) {
+  @objc func delete(_ key:String, callback:RCTResponseSenderBlock) {
     /*let removeSuccessful: Bool = KeychainWrapper.standard.removeObject(forKey: key, withAccessibility:.whenPasscodeSetThisDeviceOnly )
     print("REMOVE ITEM", removeSuccessful);*/
     
     let keychain = Keychain()
-    resolve(true)
+    
+    callback([NSNull(), true]);
     do {
       try keychain.remove(key)
     } catch let error {
       print(error)
       
-      reject("DELETE FAILED", "", error)
+      callback([error, NSNull()]);
     }
   }
 }

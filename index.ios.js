@@ -23,38 +23,56 @@ export default class AwesimTouch extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {p: ''};
+    this.state = {password: '', error: ''};
   }
 
   getKey() {
-    return KeychainManager.getItem('myKey')
-      .then(p => {
+    return KeychainManager.getItem('myKey', (error, value) => {
+      if (error) {
+        console.log('ERROR', error);
+        this.setState({error: error});
+      } else {
+        console.log('Get', value);
+        this.setState({password: value});
+      }
+    });
+/*      .then(p => {
         console.log('Password', p);
 
         this.setState({p});
 
         //KeychainManager.delete('myKey');
-      });
+      });*/
   }
 
+
   componentDidMount() {
-    KeychainManager.save('myKey', 'Some text')
-      .then(this.getKey)
+    KeychainManager.save('myKey', 'Some text', (error) => {
+      if (error) {
+        console.log('ERROR', error);
+        this.setState({error: error});
+      } else {
+        console.log('Save');
+        this.getKey();
+      }
+    });
+/*      .then(this.getKey)
       .catch(e => {
       console.log(e)
-    });
+    });*/
   }
 
   render() {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
-          Password: {this.state.p}
+          Password: {this.state.password}
         </Text>
-        {/*       <Text style={styles.instructions}>
-         To get started, edit index.ios.js
+
+        <Text style={styles.welcome}>
+          Error: {this.state.error.message}
          </Text>
-         <Text style={styles.instructions}>
+        {/*        <Text style={styles.instructions}>
          Press Cmd+R to reload,{'\n'}
          Cmd+D or shake for dev menu
          </Text>*/}
