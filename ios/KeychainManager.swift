@@ -9,6 +9,7 @@
 import Foundation
 import SwiftKeychainWrapper
 import KeychainAccess
+import LocalAuthentication
 
 @objc(KeychainManager)
 class KeychainManager : NSObject{
@@ -19,24 +20,38 @@ class KeychainManager : NSObject{
     print("REMOVE SUCCESSFUL", removeSuccessful);
   }
   
+  @objc func isAvailable( callback:@escaping RCTResponseSenderBlock) {
+    let context = LAContext()
+    
+    var error: NSError?
+    
+    if context.canEvaluatePolicy(
+      LAPolicy.deviceOwnerAuthenticationWithBiometrics,
+      error: &error) {
+      // TouchID is available on the device
+      callback([NSNull(), true]);
+    } else {
+      // TouchID is not available on the device
+      // No scanner or user has not set up TouchID
+      callback([RCTMakeError("TouchId not supported", error, nil), NSNull()]);
+    }
+  }
+  
   @objc func save(_ key:String, password:String, callback:@escaping RCTResponseSenderBlock){
     let keychain = Keychain()
     DispatchQueue.global().async {
-    do {
-      try keychain
-        .accessibility(.whenPasscodeSetThisDeviceOnly, authenticationPolicy: .userPresence)
-        .set(password, key: key)
+      do {
+        try keychain
+          .accessibility(.whenPasscodeSetThisDeviceOnly, authenticationPolicy: .userPresence)
+          .set(password, key: key)
       
-      callback([NSNull(), true]);
+        callback([NSNull(), true]);
+      }
+      catch let error {
+        print(error)
+        callback([error, NSNull()]);
+      }
     }
-    catch let error {
-      print(error)
-      callback([error, NSNull()]);
-    }
-    }
-    
-    /*let saveSuccessful: Bool = KeychainWrapper.standard.set(password, forKey: key, withAccessibility:.whenPasscodeSetThisDeviceOnly )
-    print("SAVE _SUCCESSFUL", saveSuccessful);*/
   }
   
   @objc func getItem(_ key:String, callback:@escaping RCTResponseSenderBlock) {
@@ -52,21 +67,27 @@ class KeychainManager : NSObject{
         
         callback([NSNull(), password!]);
       } catch let error {
-        print(error)
+        print("GET_ITEM", error, error.localizedDescription, type(of: error))
+        
+        if error is Status {
+          let movie = error as? Status;
+    
+            print("Movie: \(movie!.rawValue)")
+        }
+        
+        switch error {
+        case Status.userCanceled:
+          print("Lots of planets have a north")
+        default:
+          print("Where the skies are blue")
+        }
         
         callback([RCTMakeError("Failed to get Item from Keychain", error, ["key": key]), NSNull()]);
       }
     }
-    
-    /*let retrievedString: String! = KeychainWrapper.standard.string(forKey: key, withAccessibility:.whenPasscodeSetThisDeviceOnly )
-    print("GET ITEM", retrievedString);
-    
-    return retrievedString ?? ""*/
   }
   
   @objc func delete(_ key:String, callback:RCTResponseSenderBlock) {
-    /*let removeSuccessful: Bool = KeychainWrapper.standard.removeObject(forKey: key, withAccessibility:.whenPasscodeSetThisDeviceOnly )
-    print("REMOVE ITEM", removeSuccessful);*/
     
     let keychain = Keychain()
     

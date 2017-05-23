@@ -11,7 +11,7 @@ import {
   Text,
   View
 } from 'react-native';
-import {NativeModules} from 'react-native';
+import {Button, NativeModules} from 'react-native';
 const KeychainManager = NativeModules.KeychainManager;
 //console.log('HERE', KeychainManager);
 
@@ -26,7 +26,7 @@ export default class AwesimTouch extends Component {
     this.state = {password: '', error: ''};
   }
 
-  getKey() {
+  getKey = () => {
     return KeychainManager.getItem('myKey', (error, value) => {
       if (error) {
         console.log('ERROR', error);
@@ -36,17 +36,15 @@ export default class AwesimTouch extends Component {
         this.setState({password: value});
       }
     });
-/*      .then(p => {
-        console.log('Password', p);
-
-        this.setState({p});
-
-        //KeychainManager.delete('myKey');
-      });*/
   }
 
 
   componentDidMount() {
+    KeychainManager.isAvailable((error, available)=> {
+      console.log('AVAILABLE', available)
+    });
+
+
     KeychainManager.save('myKey', 'Some text', (error) => {
       if (error) {
         console.log('ERROR', error);
@@ -56,10 +54,6 @@ export default class AwesimTouch extends Component {
         this.getKey();
       }
     });
-/*      .then(this.getKey)
-      .catch(e => {
-      console.log(e)
-    });*/
   }
 
   render() {
@@ -71,11 +65,12 @@ export default class AwesimTouch extends Component {
 
         <Text style={styles.welcome}>
           Error: {this.state.error.message}
-         </Text>
-        {/*        <Text style={styles.instructions}>
-         Press Cmd+R to reload,{'\n'}
-         Cmd+D or shake for dev menu
-         </Text>*/}
+        </Text>
+        <Button
+          title="Get Item"
+          onPress={this.getKey}
+          color="#841584"
+        />
       </View>
     );
   }
