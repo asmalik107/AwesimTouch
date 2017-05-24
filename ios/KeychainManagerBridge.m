@@ -13,7 +13,7 @@
 
   RCT_EXTERN_METHOD(test)
 
-  RCT_EXTERN_METHOD(isAvailable: callback:(RCTResponseSenderBlock) callback)
+  RCT_EXTERN_METHOD(isAvailable: (RCTResponseSenderBlock) callback)
 
   RCT_EXTERN_METHOD(save: (NSString*) key password:(NSString*) password callback:(RCTResponseSenderBlock) callback)
 

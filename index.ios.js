@@ -23,7 +23,11 @@ export default class AwesimTouch extends Component {
   constructor(props) {
     super(props);
 
-    this.state = {password: '', error: ''};
+    this.state = {
+      error: '',
+      available: 'FALSE',
+      password: ''
+    };
   }
 
   getKey = () => {
@@ -38,10 +42,17 @@ export default class AwesimTouch extends Component {
     });
   }
 
-
   componentDidMount() {
-    KeychainManager.isAvailable((error, available)=> {
-      console.log('AVAILABLE', available)
+    KeychainManager.isAvailable((error, result) => {
+
+      console.log('HERE')
+      if (error) {
+        console.log('ERROR', error);
+        this.setState({error: error});
+      } else {
+        console.log('AVAILABLE', result);
+        this.setState({available: result ? 'TRUE' : 'FALSE'});
+      }
     });
 
 
@@ -60,9 +71,11 @@ export default class AwesimTouch extends Component {
     return (
       <View style={styles.container}>
         <Text style={styles.welcome}>
+          Supported: {this.state.available}
+        </Text>
+        <Text style={styles.welcome}>
           Password: {this.state.password}
         </Text>
-
         <Text style={styles.welcome}>
           Error: {this.state.error.message}
         </Text>

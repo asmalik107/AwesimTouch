@@ -20,7 +20,7 @@ class KeychainManager : NSObject{
     print("REMOVE SUCCESSFUL", removeSuccessful);
   }
   
-  @objc func isAvailable( callback:@escaping RCTResponseSenderBlock) {
+  @objc func isAvailable(_ callback:@escaping RCTResponseSenderBlock) {
     let context = LAContext()
     
     var error: NSError?
@@ -33,6 +33,22 @@ class KeychainManager : NSObject{
     } else {
       // TouchID is not available on the device
       // No scanner or user has not set up TouchID
+      switch error!.code{
+        
+      case LAError.Code.touchIDNotEnrolled.rawValue:
+        print("TouchID is not enrolled",
+                   error!.localizedDescription)
+        
+      case LAError.Code.passcodeNotSet.rawValue:
+        print("A passcode has not been set",
+                   error!.localizedDescription)
+        
+      default:
+        print("TouchID not available",
+                   error!.localizedDescription)
+        
+      }
+      print(error!)
       callback([RCTMakeError("TouchId not supported", error, nil), NSNull()]);
     }
   }
