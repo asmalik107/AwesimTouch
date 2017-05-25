@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {AppState, Button, NativeModules, StyleSheet, Text, View} from 'react-native';
+import {Alert, AppState, Button, NativeModules, StyleSheet, Text, View} from 'react-native';
 const KeychainManager = NativeModules.KeychainManager;
 
 //console.log('HERE', KeychainManager);
@@ -19,6 +19,16 @@ class App extends Component {
     };
   }
 
+  alert(){
+    Alert.alert(
+      'Alert',
+      '',
+      [
+        {text: 'OK', onPress: () => console.log('OK Pressed!')},
+      ]
+    );
+  }
+
   componentDidMount() {
     AppState.addEventListener('change', this._handleAppStateChange);
 
@@ -33,7 +43,6 @@ class App extends Component {
         this.setState({available: result ? 'TRUE' : 'FALSE'});
       }
     });
-
 
     KeychainManager.save('myKey', 'Some text', (error) => {
       if (error) {
@@ -53,10 +62,11 @@ class App extends Component {
   _handleAppStateChange = (nextAppState) => {
 
     console.log('NEXT_APP_STATE', nextAppState);
-    if (this.state.appState.match(/inactive|background/) && nextAppState === 'active') {
+    if (this.state.appState.match(/active/) && nextAppState === 'inactive') {
       console.log('APP_STATE', 'App has come to the foreground!')
     }
     this.setState({appState: nextAppState});
+    this.alert();
   }
 
   getKey = () => {
