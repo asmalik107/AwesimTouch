@@ -26,7 +26,7 @@ class KeychainManager : NSObject{
     var error: NSError?
     
     if context.canEvaluatePolicy(
-      LAPolicy.deviceOwnerAuthenticationWithBiometrics,
+      LAPolicy.deviceOwnerAuthentication,
       error: &error) {
       // TouchID is available on the device
       callback([NSNull(), true]);
@@ -81,24 +81,30 @@ class KeychainManager : NSObject{
         
         print("GET_ITEM: \(String(describing: password))")
         
-        callback([NSNull(), password!]);
+        
+        if let optionalValue = password {
+                callback([NSNull(), optionalValue]);
+        }else {
+           callback([NSNull(), ""]);
+        }
+        
+
       } catch let error {
-        print("GET_ITEM", error, error.localizedDescription, type(of: error))
+        print("GET_ITEM_ERROR", error, error.localizedDescription, type(of: error))
         
         if error is Status {
-          let movie = error as? Status;
-    
-            print("Movie: \(movie!.rawValue)")
+          let errStatus = error as? Status;
+          print("Movie: \(errStatus!.rawValue)")
         }
         
         switch error {
         case Status.userCanceled:
-          print("Lots of planets have a north")
+          print("User canceled")
         default:
           print("Where the skies are blue")
         }
         
-        callback([RCTMakeError("Failed to get Item from Keychain", error, ["key": key]), NSNull()]);
+        callback([RCTMakeError("Failed to get Item from Keychain", error, ["key": key, "description": error.localizedDescription]), NSNull()]);
       }
     }
   }
