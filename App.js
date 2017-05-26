@@ -62,11 +62,13 @@ class App extends Component {
   _handleAppStateChange = (nextAppState) => {
 
     console.log('NEXT_APP_STATE', nextAppState);
-    if (this.state.appState.match(/active/) && nextAppState === 'inactive') {
-      console.log('APP_STATE', 'App has come to the foreground!')
+    if (this.state.appState.match(/background/) && nextAppState === 'active') {
+      console.log('APP_STATE', 'App has come to the foreground!');
+      //this.alert();
+      this.getKey();
     }
     this.setState({appState: nextAppState});
-    this.alert();
+
   }
 
   getKey = () => {
